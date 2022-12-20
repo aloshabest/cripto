@@ -1,5 +1,6 @@
 import fastapi
 import pydantic_models
+from fastapi import Request
 
 
 api = fastapi.FastAPI()
@@ -23,7 +24,7 @@ fake_database = {'users':[
         "id":3,
         "name":"Vladimir",
         "nick":"Vova777",
-        "balance": "25000"
+        "balance": 200.1
      }
 ],}
 
@@ -42,3 +43,12 @@ def get_total_balance():
     for user in fake_database['users']:
         total_balance += pydantic_models.User(**user).balance
     return total_balance
+
+@api.post('/user/create')
+def index(user: pydantic_models.User):
+    fake_database['users'].append(dict(user))
+    return {'User Created!': user}
+
+@api.get("/users/")
+def get_users(skip: int = 0, limit: int = 10):
+    return fake_database['users'][skip: skip + limit]
